@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Microservice Test</title>
+</head>
+<body>
+  <h1>Microservice Test</h1>
+  
+  <h2>Average Calculator</h2>
+  <label for="numbers">Enter numbers separated by commas:</label><br>
+  <textarea id="numbers" rows="4" cols="50"></textarea><br>
+  <button onclick="calculateAverage()">Calculate Average</button><br>
+  <p id="averageResult"></p>
+
+  <h2>Prime Number Generator</h2>
+  <label for="primeLimit">Enter a limit for prime numbers:</label><br>
+  <input type="number" id="primeLimit"><br>
+  <button onclick="generatePrimes()">Generate Primes</button><br>
+  <p id="primeResult"></p>
+
+  <h2>Fibonacci Sequence Generator</h2>
+  <label for="fibonacciN">Enter the number of elements in Fibonacci sequence:</label><br>
+  <input type="number" id="fibonacciN"><br>
+  <button onclick="generateFibonacci()">Generate Fibonacci</button><br>
+  <p id="fibonacciResult"></p>
+
+  <h2>Random Number Generator</h2>
+  <button onclick="generateRandomNumbers()">Generate Random Numbers</button><br>
+  <p id="randomResult"></p>
+
+  <h2>Even Numbers</h2>
+  <button onclick="filterEvenNumbers()">Filter Even Numbers</button><br>
+  <p id="evenResult"></p>
+
+  <script>
+    async function calculateAverage() {
+      const numbersInput = document.getElementById('numbers').value;
+      const numbersArray = numbersInput.split(',').map(Number);
+      
+      try {
+        const response = await fetch('http://localhost:3000/average', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ numbers: numbersArray })
+        });
+
+        const data = await response.json();
+        document.getElementById('averageResult').innerText = `Average: ${data.average}`;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('averageResult').innerText = 'Error calculating average';
+      }
+    }
+
+    async function generatePrimes() {
+      const primeLimit = document.getElementById('primeLimit').value;
+      
+      try {
+        const response = await fetch('http://localhost:3000/primes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ limit: parseInt(primeLimit) })
+        });
+
+        const data = await response.json();
+        document.getElementById('primeResult').innerText = `Prime numbers: ${data.primes.join(', ')}`;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('primeResult').innerText = 'Error generating primes';
+      }
+    }
+
+    async function generateFibonacci() {
+      const fibonacciN = document.getElementById('fibonacciN').value;
+      
+      try {
+        const response = await fetch('http://localhost:3000/fibonacci', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ n: parseInt(fibonacciN) })
+        });
+
+        const data = await response.json();
+        document.getElementById('fibonacciResult').innerText = `Fibonacci sequence: ${data.fibonacciSeq.join(', ')}`;
+      } catch (error) {
+        console.error('Error:', error);
+        document.getElementById('fibonacciResult').innerText = 'Error generating Fibonacci sequence';
+      }
+    }
+
+    function generateRandomNumbers() {
+      const randomNumbers = [];
+      for (let i = 0; i < 10; i++) { // Change 10 to the desired number of random numbers
+        randomNumbers.push(Math.floor(Math.random() * 100)); // Generates random numbers between 0 and 99
+      }
+      document.getElementById('randomResult').innerText = `Random Numbers: ${randomNumbers.join(', ')}`;
+    }
+
+    function filterEvenNumbers() {
+      const numbersInput = document.getElementById('numbers').value;
+      const numbersArray = numbersInput.split(',').map(Number);
+      const evenNumbers = numbersArray.filter(num => num % 2 === 0);
+      document.getElementById('evenResult').innerText = `Even Numbers: ${evenNumbers.join(', ')}`;
+    }
+  </script>
+</body>
+</html>
